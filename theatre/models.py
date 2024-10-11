@@ -7,23 +7,35 @@ class Actor(models.Model):
     last_name = models.CharField(max_length=255)
 
     @property
-    def get_full_name(self):
+    def full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def __str__(self):
+        return self.full_name
 
 
 class Genre(models.Model):
     name = models.CharField(max_length=255)
 
+    def __str__(self):
+        return self.name
+
 
 class Play(models.Model):
     title = models.CharField(max_length=255)
-    description = models.TextField
+    description = models.TextField()
+
+    def __str__(self):
+        return self.title
 
 
 class TheatreHall(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
     seats_in_row = models.IntegerField()
+
+    def __str__(self):
+        return self.name
 
 
 class Performance(models.Model):
@@ -39,6 +51,9 @@ class Performance(models.Model):
     )
     show_time = models.DateTimeField()
 
+    def __str__(self):
+        return self.play.title
+
 
 class Reservation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -46,6 +61,9 @@ class Reservation(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
+
+    def __str__(self):
+        return f"{self.created_at}"
 
 
 class Ticket(models.Model):
@@ -61,3 +79,6 @@ class Ticket(models.Model):
         on_delete=models.CASCADE,
         related_name="tickets"
     )
+
+    def __str__(self):
+        return f"{self.performance.play.title} - ({self.row}:{self.seat})"

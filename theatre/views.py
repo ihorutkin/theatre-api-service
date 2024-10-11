@@ -1,30 +1,55 @@
-from django.shortcuts import render
 from rest_framework import viewsets
+
+from theatre.models import (
+    Play,
+    Actor,
+    Genre,
+    TheatreHall,
+    Performance,
+    Reservation,
+    Ticket
+)
+from theatre.serializers import (
+    PlaySerializer,
+    ActorSerializer,
+    GenreSerializer,
+    TheatreHallSerializer,
+    PerformanceSerializer,
+    ReservationSerializer,
+    TicketSerializer
+)
 
 
 class PlayViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Play.objects.all()
+    serializer_class = PlaySerializer
 
 
 class ActorViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Actor.objects.all()
+    serializer_class = ActorSerializer
 
 
 class GenreViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
 
 
 class TheatreHallViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = TheatreHall.objects.all()
+    serializer_class = TheatreHallSerializer
 
 
 class PerformanceViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Performance.objects.all()
+    serializer_class = PerformanceSerializer
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Reservation.objects.all()
+    serializer_class = ReservationSerializer
 
 
 class TicketViewSet(viewsets.ModelViewSet):
-    pass
+    queryset = Ticket.objects.all()
+    serializer_class = TicketSerializer
