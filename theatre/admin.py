@@ -11,6 +11,11 @@ from theatre.models import (
 )
 
 
+class TicketInLine(admin.TabularInline):
+    model = Ticket
+    extra = 1
+
+
 @admin.register(Actor)
 class ActorAdmin(admin.ModelAdmin):
     list_display = ("id", "first_name", "last_name")
@@ -37,6 +42,7 @@ class PerformanceAdmin(admin.ModelAdmin):
 
 @admin.register(Reservation)
 class ReservationAdmin(admin.ModelAdmin):
+    inlines = [TicketInLine]
     list_display = ("id", "created_at")
 
 
