@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rest_framework.authtoken",
     "theatre",
     "user"
 ]
@@ -115,6 +116,15 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "theatre.permissions.IsAdminOrIfAuthenticatedReadOnly",
+    ]
+}
 
 
 # Static files (CSS, JavaScript, Images)
