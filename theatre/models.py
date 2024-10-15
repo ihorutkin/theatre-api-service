@@ -1,3 +1,8 @@
+import pathlib
+import uuid
+
+from django.utils.text import slugify
+
 from theatre_core import settings
 from django.db import models
 
@@ -21,11 +26,17 @@ class Genre(models.Model):
         return self.name
 
 
+def play_image_path(instance: "Play", filename: str) -> pathlib.Path:
+    filename = f"{ slugify(instance.title)}-{uuid.uuid4()}" + pathlib.Path(filename).suffix
+    return pathlib.Path("upload/plays") / pathlib.Path(filename)
+
+
 class Play(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     actors = models.ManyToManyField(Actor, related_name="plays")
     genres = models.ManyToManyField(Genre, related_name="plays")
+    image = models.ImageField(null=True, upload_to=play_image_path)
 
     def __str__(self):
         return self.title

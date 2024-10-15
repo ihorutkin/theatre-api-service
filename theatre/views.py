@@ -1,7 +1,11 @@
+from datetime import datetime
+
 from django.db.models import F, Count
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import extend_schema, OpenApiParameter
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from theatre.models import (
     Play,
@@ -21,7 +25,7 @@ from theatre.serializers import (
     PerformanceSerializer,
     ReservationSerializer,
     TicketSerializer, PlayListSerializer, PlayRetrieveSerializer, PerformanceListSerializer,
-    PerformanceRetrieveSerializer, ReservationListSerializer
+    PerformanceRetrieveSerializer, ReservationListSerializer, PlayImageSerializer, ReservationRetrieveSerializer
 )
 
 
@@ -59,8 +63,25 @@ class PlayViewSet(viewsets.ModelViewSet):
             return PlayListSerializer
         elif self.action == "retrieve":
             return PlayRetrieveSerializer
+        elif self.action == "upload_image":
+            return PlayImageSerializer
 
         return PlaySerializer
+
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image"
+    )
+    def upload_image(self, request, pk=None):
+        play = self.get_object()
+        serializer = self.get_serializer(play, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @extend_schema(
         parameters=[
@@ -105,6 +126,19 @@ class GenreViewSet(viewsets.ModelViewSet):
 
         return queryset.distinct()
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "name",
+                type=OpenApiTypes.STR,
+                description="Filter by genre name (ex. ?name=Comedy)",
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """Get list of genres"""
+        return super().list(request, *args, **kwargs)
+
 
 class TheatreHallViewSet(viewsets.ModelViewSet):
     queryset = TheatreHall.objects.all()
@@ -112,25 +146,51 @@ class TheatreHallViewSet(viewsets.ModelViewSet):
 
 
 class PerformanceViewSet(viewsets.ModelViewSet):
-    queryset = Performance.objects.all()
+    queryset = (
+        Performance.objects.all()
+        .prefetch_related("tickets")
+        .annotate(
+            tickets_available=(
+                    F("theatre_hall__rows") *
+                    F("theatre_hall__seats_in_row") -
+                    Count("tickets")
+            )
+        )
+    )
+    serializer_class = PerformanceSerializer
 
     def get_queryset(self):
-        queryset = self.queryset.select_related("play", "theatre_hall")
+        date = self.request.query_params.get("date")
+        play_id_str = self.request.query_params.get("play")
 
-        if self.action == "list":
-            queryset = (
-                queryset
-                .prefetch_related("tickets")
-                .annotate(
-                    tickets_available=(
-                        F("theatre_hall__rows") *
-                        F("theatre_hall__seats_in_row") -
-                        Count("tickets")
-                    )
-                )
-            )
+        queryset = self.queryset
+
+        if date:
+            date = datetime.strptime(date, "%Y-%m-%d").date()
+            queryset = queryset.filter(show_time__date=date)
+
+        if play_id_str:
+            queryset = queryset.filter(play_id=int(play_id_str))
 
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "date",
+                type=OpenApiTypes.DATE,
+                description="Filter by performance date (ex. ?show_time=2024-12-10T20:00:00Z)",
+            ),
+            OpenApiParameter(
+                "play",
+                type=OpenApiTypes.INT,
+                description="Filter by play name (ex. ?play=1)",
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """Get list of genres"""
+        return super().list(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action == "list":
@@ -152,13 +212,10 @@ class ReservationViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == "list":
             return ReservationListSerializer
+        elif self.action == "retrieve":
+            return ReservationRetrieveSerializer
 
         return ReservationSerializer
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-
-class TicketViewSet(viewsets.ModelViewSet):
-    queryset = Ticket.objects.all()
-    serializer_class = TicketSerializer
