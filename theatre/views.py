@@ -14,7 +14,6 @@ from theatre.models import (
     TheatreHall,
     Performance,
     Reservation,
-    Ticket
 )
 from theatre.pagination import OrderPagination
 from theatre.serializers import (
@@ -24,7 +23,7 @@ from theatre.serializers import (
     TheatreHallSerializer,
     PerformanceSerializer,
     ReservationSerializer,
-    TicketSerializer, PlayListSerializer, PlayRetrieveSerializer, PerformanceListSerializer,
+    PlayListSerializer, PlayRetrieveSerializer, PerformanceListSerializer,
     PerformanceRetrieveSerializer, ReservationListSerializer, PlayImageSerializer, ReservationRetrieveSerializer
 )
 
