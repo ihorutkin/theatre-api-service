@@ -12,8 +12,8 @@ from rest_framework import status
 from theatre.models import Play, TheatreHall, Performance, Genre, Actor
 from theatre.serializers import PlayListSerializer, PlayRetrieveSerializer
 
-PLAY_URL = reverse("cinema:play-list")
-PERFORMANCE_URL = reverse("cinema:performance-list")
+PLAY_URL = reverse("theatre:play-list")
+PERFORMANCE_URL = reverse("theatre:performance-list")
 
 
 def sample_plays(**params):
@@ -44,11 +44,11 @@ def sample_plays_session(**params):
 
 def image_upload_url(play_id):
     """Return URL for recipe image upload"""
-    return reverse("cinema:play-upload-image", args=[play_id])
+    return reverse("theatre:play-upload-image", args=[play_id])
 
 
 def detail_url(play_id):
-    return reverse("cinema:play-detail", args=[play_id])
+    return reverse("theatre:play-detail", args=[play_id])
 
 
 class UnauthenticatedPlayApiTests(TestCase):

@@ -59,11 +59,11 @@ class PlayViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == "list":
-            return PlayListSerializer
+            return PlayListSerializer()
         elif self.action == "retrieve":
-            return PlayRetrieveSerializer
+            return PlayRetrieveSerializer()
         elif self.action == "upload_image":
-            return PlayImageSerializer
+            return PlayImageSerializer()
 
         return PlaySerializer
 
@@ -146,7 +146,7 @@ class TheatreHallViewSet(viewsets.ModelViewSet):
 
 class PerformanceViewSet(viewsets.ModelViewSet):
     queryset = (
-        Performance.objects.all()
+        Performance.objects
         .prefetch_related("tickets")
         .annotate(
             tickets_available=(
@@ -193,9 +193,9 @@ class PerformanceViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == "list":
-            return PerformanceListSerializer
+            return PerformanceListSerializer()
         elif self.action == "retrieve":
-            return PerformanceRetrieveSerializer
+            return PerformanceRetrieveSerializer()
 
         return PerformanceSerializer
 
@@ -210,9 +210,9 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == "list":
-            return ReservationListSerializer
+            return ReservationListSerializer()
         elif self.action == "retrieve":
-            return ReservationRetrieveSerializer
+            return ReservationRetrieveSerializer()
 
         return ReservationSerializer
 
