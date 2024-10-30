@@ -42,7 +42,7 @@ class PlayViewSet(viewsets.ModelViewSet):
         actors = self.request.query_params.get("actors")
         genres = self.request.query_params.get("genres")
 
-        queryset = self.queryset
+        queryset = super().get_queryset()
 
         if title:
             queryset = queryset.filter(title__icontains=title)
@@ -59,13 +59,13 @@ class PlayViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == "list":
-            return PlayListSerializer()
+            return PlayListSerializer
         elif self.action == "retrieve":
-            return PlayRetrieveSerializer()
+            return PlayRetrieveSerializer
         elif self.action == "upload_image":
-            return PlayImageSerializer()
+            return PlayImageSerializer
 
-        return PlaySerializer
+        return self.serializer_class
 
     @action(
         methods=["POST"],
@@ -118,7 +118,7 @@ class GenreViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         name = self.request.query_params.get("name")
 
-        queryset = self.queryset
+        queryset = super().get_queryset()
 
         if name:
             queryset = queryset.filter(name__icontains=name)
@@ -162,7 +162,7 @@ class PerformanceViewSet(viewsets.ModelViewSet):
         date = self.request.query_params.get("date")
         play_id_str = self.request.query_params.get("play")
 
-        queryset = self.queryset
+        queryset = super().get_queryset()
 
         if date:
             date = datetime.strptime(date, "%Y-%m-%d").date()
@@ -193,11 +193,11 @@ class PerformanceViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == "list":
-            return PerformanceListSerializer()
+            return PerformanceListSerializer
         elif self.action == "retrieve":
-            return PerformanceRetrieveSerializer()
+            return PerformanceRetrieveSerializer
 
-        return PerformanceSerializer
+        return self.serializer_class
 
 
 class ReservationViewSet(viewsets.ModelViewSet):
@@ -210,11 +210,11 @@ class ReservationViewSet(viewsets.ModelViewSet):
 
     def get_serializer_class(self):
         if self.action == "list":
-            return ReservationListSerializer()
+            return ReservationListSerializer
         elif self.action == "retrieve":
-            return ReservationRetrieveSerializer()
+            return ReservationRetrieveSerializer
 
-        return ReservationSerializer
+        return self.serializer_class
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

@@ -126,7 +126,7 @@ class Ticket(models.Model):
         **kwargs
     ):
         self.full_clean()
-        return super(Ticket, self).save(*args, *kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.performance.play.title} - ({self.row}:{self.seat})"
